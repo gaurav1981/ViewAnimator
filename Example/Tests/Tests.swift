@@ -14,16 +14,43 @@ class Tests: XCTestCase {
         super.tearDown()
     }
     
-    func testExample() {
-        // This is an example of a functional test case.
-        XCTAssert(true, "Pass")
+    func testPreservesTransform() {
+        let view = UIView()
+        let preTransform = CGAffineTransform(rotationAngle: 3.14)
+        view.transform = preTransform
+        
+        let zoom = AnimationType.zoom(scale: 2.5)
+        let translate = AnimationType.from(direction: .bottom, offset: 50)
+        
+        let animationCompleteExpectation = expectation(description: "Animate with multiple transforms")
+        
+        view.animate(animations: [zoom, translate]) {
+            animationCompleteExpectation.fulfill()
+            XCTAssert(view.transform == preTransform)
+        }
+        
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
     
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measure() {
-            // Put the code you want to measure the time of here.
+    func testTransformOnReverse() {
+        let view = UIView()
+        
+        let rotate = AnimationType.rotate(angle: CGFloat.pi)
+        let translate = AnimationType.from(direction: .right, offset: 20)
+        let animations = [rotate, translate]
+        
+        var expectedTransform = view.transform
+        animations.forEach { expectedTransform = expectedTransform.concatenating($0.initialTransform) }
+        
+        let animationCompleteExpectation = expectation(description: "Animate with multiple transforms")
+        
+        view.animate(animations: animations, reversed: true) {
+            animationCompleteExpectation.fulfill()
+            XCTAssert(view.transform == expectedTransform)
         }
+        
+        waitForExpectations(timeout: 1.0, handler: nil)
     }
     
 }
+

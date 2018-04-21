@@ -24,14 +24,16 @@ class ViewController: UIViewController {
     }
 
     @IBAction func animate() {
-        view.animateRandom()
-        
         // Combined animations example
-//        let fromAnimation = AnimationType.from(direction: .right, offset: 30.0)
-//        let zoomAnimation = AnimationType.zoom(scale: 0.2)
-//        let rotateAnimation = AnimationType.rotate(angle: CGFloat.pi/6)
-//        collectionView.animateViews(animations: [zoomAnimation, rotateAnimation], duration: 0.5)
-//        tableView.animateViews(animations: [fromAnimation, zoomAnimation], duration: 0.5)
+        let fromAnimation = AnimationType.from(direction: .right, offset: 30.0)
+        let zoomAnimation = AnimationType.zoom(scale: 0.2)
+        let rotateAnimation = AnimationType.rotate(angle: CGFloat.pi/6)
+        UIView.animate(views: collectionView.visibleCells,
+                       animations: [zoomAnimation, rotateAnimation],
+                       duration: 0.5)
+        
+        UIView.animate(views: tableView.visibleCells,
+                       animations: [fromAnimation, zoomAnimation], delay: 0.5)
     }
 }
 
@@ -45,7 +47,7 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "tableCell") as! TableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "tableCell", for: indexPath) as! TableViewCell
         cell.userImageView.image = UIImage(named: "\(indexPath.row)")
         return cell
     }
